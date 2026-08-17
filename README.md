@@ -4,6 +4,8 @@
 
 ## LIVE DEMO : https://smartpost-1d44.onrender.com
 
+## PROTOTYPE : https://drive.google.com/file/d/1WMJqDU2JESB-EQt4bqNn1YHXWO_O6slf/view?usp=drive_link
+
 ---
 
 ## 🚀 Key Features
