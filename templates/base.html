@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SmartPost{% endblock %} – Smart Postal Management System</title>
+    <meta name="description" content="SmartPost - AI-Powered Post Office Management and Smart Delivery System. Seamless tracking, postal booking, and delivery delay predictions.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="{{ current_theme | default('theme-dashboard') }}">
+
+{% if session.get('user_id') %}
+<div class="app-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="{{ url_for('dashboard') }}" class="smartpost-logo">
+                <div class="logo-icon">📮</div>
+                <div class="logo-text">SmartPost</div>
+                <div class="logo-badge">PRO</div>
+            </a>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="sidebar-menu-item">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <span class="sidebar-icon">📊</span> Dashboard
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="{{ url_for('customers') }}" class="sidebar-link {% if request.endpoint in ['customers', 'add_customer', 'edit_customer'] %}active{% endif %}">
+                    <span class="sidebar-icon">👥</span> Customers
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="{{ url_for('booking') }}" class="sidebar-link {% if request.endpoint in ['booking', 'booking_success'] %}active{% endif %}">
+                    <span class="sidebar-icon">📦</span> Postal Booking
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="{{ url_for('shipments') }}" class="sidebar-link {% if request.endpoint in ['shipments', 'shipment_details'] %}active{% endif %}">
+                    <span class="sidebar-icon">🚚</span> Shipments
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="{{ url_for('tracking') }}" class="sidebar-link {% if request.endpoint == 'tracking' %}active{% endif %}">
+                    <span class="sidebar-icon">📍</span> Tracking
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="{{ url_for('services') }}" class="sidebar-link {% if request.endpoint == 'services' %}active{% endif %}">
+                    <span class="sidebar-icon">📑</span> Postal Services
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="{{ url_for('prediction') }}" class="sidebar-link {% if request.endpoint == 'prediction' %}active{% endif %}">
+                    <span class="sidebar-icon">⚡</span> AI Delay Prediction
+                </a>
+            </li>
+            {% if session.get('role') == 'Admin' %}
+            <li class="sidebar-menu-item">
+                <a href="{{ url_for('employees') }}" class="sidebar-link {% if request.endpoint in ['employees', 'add_employee'] %}active{% endif %}">
+                    <span class="sidebar-icon">👔</span> Employee Management
+                </a>
+            </li>
+            {% endif %}
+            <li class="sidebar-menu-item">
+                <a href="{{ url_for('complaints') }}" class="sidebar-link {% if request.endpoint in ['complaints', 'add_complaint'] %}active{% endif %}">
+                    <span class="sidebar-icon">💬</span> Complaints
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="{{ url_for('notifications') }}" class="sidebar-link {% if request.endpoint == 'notifications' %}active{% endif %}">
+                    <span class="sidebar-icon">🔔</span> Notifications
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="{{ url_for('reports') }}" class="sidebar-link {% if request.endpoint == 'reports' %}active{% endif %}">
+                    <span class="sidebar-icon">📈</span> Operational Reports
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="{{ url_for('about') }}" class="sidebar-link {% if request.endpoint == 'about' %}active{% endif %}">
+                    <span class="sidebar-icon">ℹ️</span> About System
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-user">
+            <div class="user-info">
+                <span class="user-name">{{ session.get('name', 'User') }}</span>
+                <span class="user-role">{{ session.get('role', 'Staff') }}</span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn btn-secondary btn-sm" title="Logout">🚪</a>
+        </div>
+    </aside>
+
+    <!-- Main Section -->
+    <div class="main-content">
+        <header class="topbar">
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Sidebar">☰</button>
+            <div class="topbar-title">
+                <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-main);">SmartPost Management Console</h3>
+            </div>
+            <div class="topbar-actions">
+                <a href="{{ url_for('booking') }}" class="btn btn-primary btn-sm">+ New Booking</a>
+                <a href="{{ url_for('tracking') }}" class="btn btn-secondary btn-sm">🔍 Track</a>
+            </div>
+        </header>
+
+        <main class="page-container">
+            <!-- Flash Message Alerts -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                <span>{{ message }}</span>
+                                <button type="button" class="alert-close" onclick="this.parentElement.remove()">×</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+{% else %}
+    <!-- Public Header layout for pages without session -->
+    {% block public_content %}{% endblock %}
+{% endif %}
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

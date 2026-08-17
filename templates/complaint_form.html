@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Register Complaint – SmartPost{% endblock %}
+
+{% block content %}
+<div style="max-width: 750px; margin: 0 auto;">
+    <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <h1 style="font-size: 2rem; margin-bottom: 6px;">Register Customer Complaint</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Log parcel issues, tracking delays, or service grievances for prompt investigation.</p>
+        </div>
+        <a href="{{ url_for('complaints') }}" class="btn btn-secondary">← Back to Complaints</a>
+    </div>
+
+    <div class="card" style="padding: 32px;">
+        <form action="{{ url_for('add_complaint') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Customer Name *</label>
+                <input type="text" name="customer_name" class="form-control" placeholder="e.g. Charles Montgomery" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Tracking Number (If Applicable)</label>
+                    <input type="text" name="tracking_number" class="form-control" placeholder="e.g. SP202608050002">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Complaint Category *</label>
+                    <select name="complaint_type" class="form-select" required>
+                        <option value="Delayed Shipment">Delayed Shipment</option>
+                        <option value="Missing Shipment">Missing Shipment</option>
+                        <option value="Damaged Parcel">Damaged Parcel</option>
+                        <option value="Incorrect Delivery">Incorrect Delivery</option>
+                        <option value="Payment Issue">Payment Issue</option>
+                        <option value="Other">Other Service Issue</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Priority Rating</label>
+                <select name="priority" class="form-select">
+                    <option value="LOW">LOW - Minor inquiry</option>
+                    <option value="MEDIUM" selected>MEDIUM - Standard investigation</option>
+                    <option value="HIGH">HIGH - Urgent delay / damaged item</option>
+                    <option value="CRITICAL">CRITICAL - Severe loss or high value issue</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Detailed Description of Issue *</label>
+                <textarea name="description" rows="5" class="form-control" placeholder="Describe the issue, timeline, and requested resolution..." required></textarea>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Complaint Ticket</button>
+                <a href="{{ url_for('complaints') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}About SmartPost – System Architecture{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+    <div style="margin-bottom: 28px; text-align: center;">
+        <a href="/" class="smartpost-logo" style="margin-bottom: 14px;">
+            <div class="logo-icon">📮</div>
+            <div class="logo-text">SmartPost</div>
+            <div class="logo-badge">SYSTEM</div>
+        </a>
+        <h1 style="font-size: 2.2rem; margin-top: 10px; margin-bottom: 8px;">About SmartPost</h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem;">AI-Powered Post Office Management and Smart Delivery System</p>
+    </div>
+
+    <!-- Overview Card -->
+    <div class="card" style="padding: 32px; margin-bottom: 28px; line-height: 1.8;">
+        <h2 style="font-size: 1.4rem; color: var(--accent); margin-bottom: 14px;">Project Overview</h2>
+        <p style="font-size: 1.05rem; margin-bottom: 16px;">
+            <strong>SmartPost</strong> is an end-to-end web software application designed to digitally streamline core postal office operations. The platform integrates customer registration, parcel booking, automated postage calculation, dynamic shipment tracking, staff administration, complaint tracking, and operational reports.
+        </p>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            A key innovation of SmartPost is its embedded Machine Learning module, which uses a trained Random Forest Classifier to analyze shipment characteristics (distance, weight, weather, hub workload, and holiday surge) and forecast potential delivery delays before parcels leave the counter.
+        </p>
+    </div>
+
+    <!-- Technology Stack Cards -->
+    <h2 style="font-size: 1.4rem; margin-bottom: 16px;">Technology Stack Specification</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 32px;">
+        <div class="card" style="padding: 20px; text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">🌐</div>
+            <h4 style="margin-bottom: 4px;">HTML5 & CSS3</h4>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">13 bespoke page themes with CSS Variables & Glassmorphism.</div>
+        </div>
+        <div class="card" style="padding: 20px; text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">⚡</div>
+            <h4 style="margin-bottom: 4px;">Vanilla JavaScript</h4>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">Pure DOM interaction, live postage calculator, AJAX inference.</div>
+        </div>
+        <div class="card" style="padding: 20px; text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">🐍</div>
+            <h4 style="margin-bottom: 4px;">Python Flask</h4>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">Session authentication, protected routes, RESTful APIs.</div>
+        </div>
+        <div class="card" style="padding: 20px; text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">💾</div>
+            <h4 style="margin-bottom: 4px;">SQLite3</h4>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">11 relational tables auto-initialized with parameterized SQL.</div>
+        </div>
+        <div class="card" style="padding: 20px; text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">🤖</div>
+            <h4 style="margin-bottom: 4px;">Scikit-learn</h4>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">RandomForestClassifier trained for delay prediction.</div>
+        </div>
+        <div class="card" style="padding: 20px; text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">📊</div>
+            <h4 style="margin-bottom: 4px;">Pandas & NumPy</h4>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">Synthetic dataset generation and matrix features.</div>
+        </div>
+        <div class="card" style="padding: 20px; text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">📦</div>
+            <h4 style="margin-bottom: 4px;">Joblib</h4>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">Persistent ML model serialization (delivery_delay_model.pkl).</div>
+        </div>
+        <div class="card" style="padding: 20px; text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">📈</div>
+            <h4 style="margin-bottom: 4px;">Chart.js CDN</h4>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">Interactive pie, bar, and doughnut charts.</div>
+        </div>
+    </div>
+
+    <!-- AI Methodology -->
+    <div class="card" style="padding: 32px; margin-bottom: 28px;">
+        <h2 style="font-size: 1.4rem; color: var(--accent); margin-bottom: 14px;">AI & Machine Learning Methodology</h2>
+        <p style="font-size: 0.95rem; line-height: 1.7; color: var(--text-main); margin-bottom: 14px;">
+            The artificial intelligence module predicts whether a shipment will experience <strong>ON TIME</strong> delivery or a <strong>POSSIBLE DELAY</strong> based on 9 core features:
+        </p>
+        <ul style="list-style: square; padding-left: 20px; font-size: 0.92rem; color: var(--text-muted); line-height: 1.8;">
+            <li><code>service_type</code>: Postal category tier (Speed Post, Parcel, International, etc.)</li>
+            <li><code>weight</code>: Package weight in kilograms</li>
+            <li><code>distance</code>: Transit distance between origin and destination in kilometers</li>
+            <li><code>processing_days</code>: Allotted hub processing timeframe</li>
+            <li><code>destination_type</code>: Geographical classification (Urban, Rural, Remote)</li>
+            <li><code>previous_delay_rate</code>: Historical delay probability at target hub</li>
+            <li><code>workload</code>: Current depot package congestion index (1-10)</li>
+            <li><code>weather_risk</code>: Environmental weather conditions (Low, Medium, High)</li>
+            <li><code>holiday_period</code>: Festive season volume surge indicator</li>
+        </ul>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 14px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px;">
+            Note: In accordance with academic project standards, the model is trained on a synthetic dataset generated by <code>train_model.py</code>.
+        </p>
+    </div>
+
+    <!-- Core Modules Breakdown -->
+    <div class="card" style="padding: 32px; margin-bottom: 28px;">
+        <h2 style="font-size: 1.4rem; color: var(--accent); margin-bottom: 14px;">System Modules</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; font-size: 0.92rem;">
+            <div style="background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px;">
+                <strong>1. Customer Management:</strong> Sender/receiver profiles, ID proof verification, address book.
+            </div>
+            <div style="background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px;">
+                <strong>2. Postal Booking:</strong> Dynamic tracking number generation, automated weight & declared value calculation.
+            </div>
+            <div style="background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px;">
+                <strong>3. Shipment Tracking:</strong> Vertical status journey timeline from booking to doorstep delivery.
+            </div>
+            <div style="background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px;">
+                <strong>4. Employee Management:</strong> Staff directory, role permissions, active/inactive status.
+            </div>
+            <div style="background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px;">
+                <strong>5. Complaints System:</strong> Customer ticket logging, priority assignment, status updates.
+            </div>
+            <div style="background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px;">
+                <strong>6. Operational Reports:</strong> Exportable analytics, revenue breakdowns, and print receipts.
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

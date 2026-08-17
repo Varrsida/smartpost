@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Postal Services Catalog – SmartPost{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 28px;">
+    <h1 style="font-size: 2rem; margin-bottom: 6px;">Postal Services Catalog</h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">Explore official postal tiers, pricing structure, and delivery categories.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+    {% for s in services %}
+    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                <span class="badge badge-success">{{ s.delivery_category }}</span>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Code: {{ s.service_code }}</span>
+            </div>
+
+            <h3 style="font-size: 1.4rem; margin-bottom: 10px; color: #ffffff;">{{ s.service_name }}</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 20px; line-height: 1.6;">
+                {{ s.description }}
+            </p>
+
+            <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 10px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Base Fee:</span>
+                    <strong style="color: var(--accent); font-size: 1.1rem;">${{ "%.2f"|format(s.base_fee) }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Per Kg Rate:</span>
+                    <strong>${{ "%.2f"|format(s.per_kg_fee) }} / kg</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Est. Transit:</span>
+                    <strong style="color: #34d399;">{{ s.estimated_days }} Business Days</strong>
+                </div>
+            </div>
+
+            <ul style="list-style: none; margin-bottom: 20px; font-size: 0.88rem; color: var(--text-main);">
+                <li style="margin-bottom: 6px;">✓ Dynamic barcode & tracking number</li>
+                <li style="margin-bottom: 6px;">✓ Doorstep pickup & counter acceptance</li>
+                <li style="margin-bottom: 6px;">✓ AI delay risk monitoring</li>
+            </ul>
+        </div>
+
+        <a href="{{ url_for('booking') }}" class="btn btn-primary" style="width: 100%;">Book This Service</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

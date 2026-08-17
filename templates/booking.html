@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Postal Booking & Postage Calculator – SmartPost{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 28px;">
+    <h1 style="font-size: 2rem; margin-bottom: 6px;">Postal Shipment Booking</h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">Register new letters or parcels, calculate postage rates, and issue dynamic tracking numbers.</p>
+</div>
+
+<form action="{{ url_for('booking') }}" method="POST">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
+        
+        <!-- SENDER CARD -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📤 Sender Information</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Quick Select Registered Customer (Optional)</label>
+                <select id="quick_sender" class="form-select" onchange="autofillSender(this)">
+                    <option value="">-- Choose Existing Customer --</option>
+                    {% for cust in customers %}
+                    <option value="{{ cust.id }}" data-name="{{ cust.full_name }}" data-phone="{{ cust.phone }}" data-address="{{ cust.address }}" data-city="{{ cust.city }}" data-state="{{ cust.state }}" data-postal="{{ cust.postal_code }}">
+                        {{ cust.full_name }} ({{ cust.city }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Sender Full Name *</label>
+                <input type="text" id="sender_name" name="sender_name" class="form-control" placeholder="e.g. Alexander Wright" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Phone *</label>
+                    <input type="text" id="sender_phone" name="sender_phone" class="form-control" placeholder="+1 (555) 234-5678" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Postal Code *</label>
+                    <input type="text" id="sender_postal_code" name="sender_postal_code" class="form-control" placeholder="97477" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Address *</label>
+                <input type="text" id="sender_address" name="sender_address" class="form-control" placeholder="742 Evergreen Terrace" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">City *</label>
+                    <input type="text" id="sender_city" name="sender_city" class="form-control" placeholder="Springfield" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">State *</label>
+                    <input type="text" id="sender_state" name="sender_state" class="form-control" placeholder="OR" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECEIVER CARD -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📥 Receiver Information</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Receiver Full Name *</label>
+                <input type="text" name="receiver_name" class="form-control" placeholder="e.g. Beatrice Vance" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Phone *</label>
+                    <input type="text" name="receiver_phone" class="form-control" placeholder="+1 (555) 345-6789" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Postal Code *</label>
+                    <input type="text" name="receiver_postal_code" class="form-control" placeholder="90210" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Address *</label>
+                <input type="text" name="receiver_address" class="form-control" placeholder="124 Conch Street" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">City *</label>
+                    <input type="text" name="receiver_city" class="form-control" placeholder="Bikini Bottom" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">State / Country *</label>
+                    <input type="text" name="receiver_state" class="form-control" placeholder="CA" required>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SHIPMENT DETAILS & LIVE POSTAGE CALCULATOR -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; margin-top: 10px;">
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📦 Package & Service Specifications</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Service Type *</label>
+                    <select id="service_type" name="service_type" class="form-select" required>
+                        {% for s in services %}
+                        <option value="{{ s.service_name }}">{{ s.service_name }} ({{ s.delivery_category }})</option>
+                        {% else %}
+                        <option value="Ordinary Post">Ordinary Post</option>
+                        <option value="Speed Post">Speed Post</option>
+                        <option value="Registered Post">Registered Post</option>
+                        <option value="Parcel">Parcel Delivery</option>
+                        <option value="Express Parcel">Express Parcel</option>
+                        <option value="International Parcel">International Parcel</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Item Category</label>
+                    <select name="item_type" class="form-select">
+                        <option value="Letter">Letter / Mail</option>
+                        <option value="Document">Document Envelope</option>
+                        <option value="Parcel">Standard Parcel</option>
+                        <option value="Package">Heavy Package</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Weight (kg) *</label>
+                    <input type="number" id="weight" name="weight" step="0.1" min="0.1" max="50" class="form-control" value="0.5" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Quantity</label>
+                    <input type="number" name="quantity" min="1" max="100" class="form-control" value="1" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Declared Value ($)</label>
+                    <input type="number" id="declared_value" name="declared_value" step="1" min="0" class="form-control" value="50">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Payment Method</label>
+                    <select name="payment_mode" class="form-select">
+                        <option value="Cash">Cash at Counter</option>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="Debit Card">Debit Card</option>
+                        <option value="UPI / Digital">UPI / Digital Wallet</option>
+                        <option value="Net Banking">Net Banking</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- POSTAGE CALCULATOR BREAKDOWN -->
+        <div class="card" style="border-color: var(--accent); background: linear-gradient(135deg, var(--bg-card) 0%, rgba(217, 70, 239, 0.15) 100%);">
+            <div class="card-header">
+                <div class="card-title">💳 Live Postage Charges Breakdown</div>
+                <span class="badge badge-info">Auto Calculated</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.95rem;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px;">
+                    <span style="color: var(--text-muted);">Base Service Fee:</span>
+                    <strong id="calc_base">$15.00</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px;">
+                    <span style="color: var(--text-muted);">Weight Charge (Per Kg):</span>
+                    <strong id="calc_weight">$5.00</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px;">
+                    <span style="color: var(--text-muted);">Handling & Counter Charge:</span>
+                    <strong id="calc_service">$5.00</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px;">
+                    <span style="color: var(--text-muted);">Value Surcharge / Insurance:</span>
+                    <strong id="calc_additional">$0.00</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; padding-top: 10px; font-size: 1.3rem; font-weight: 800; color: #ffffff;">
+                    <span>Total Postage Amount:</span>
+                    <span id="calc_total" style="color: var(--accent); font-family: var(--font-heading);">$25.00</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px; margin-top: 24px; font-size: 1.1rem;">
+                ✨ CONFIRM & ISSUE BOOKING
+            </button>
+        </div>
+
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function autofillSender(selectEl) {
+    const selected = selectEl.options[selectEl.selectedIndex];
+    if (selected && selected.dataset.name) {
+        document.getElementById('sender_name').value = selected.dataset.name || '';
+        document.getElementById('sender_phone').value = selected.dataset.phone || '';
+        document.getElementById('sender_address').value = selected.dataset.address || '';
+        document.getElementById('sender_city').value = selected.dataset.city || '';
+        document.getElementById('sender_state').value = selected.dataset.state || '';
+        document.getElementById('sender_postal_code').value = selected.dataset.postal || '';
+    }
+}
+</script>
+{% endblock %}

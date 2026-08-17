@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Shipment Management – SmartPost{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <h1 style="font-size: 2rem; margin-bottom: 6px;">Shipment Management</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Monitor, filter, and update current postal dispatch status across all hubs.</p>
+    </div>
+    <a href="{{ url_for('booking') }}" class="btn btn-primary">+ Book New Parcel</a>
+</div>
+
+<!-- Search & Status Filter -->
+<div class="card" style="padding: 16px 20px; margin-bottom: 24px;">
+    <form action="{{ url_for('shipments') }}" method="GET" style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <input type="text" name="search" class="form-control" style="flex: 2; min-width: 200px;" placeholder="Search tracking number, sender, receiver, destination..." value="{{ search }}">
+        
+        <select name="status" class="form-select" style="flex: 1; min-width: 160px;">
+            <option value="">-- All Statuses --</option>
+            <option value="BOOKED" {% if status_filter == 'BOOKED' %}selected{% endif %}>BOOKED</option>
+            <option value="ACCEPTED" {% if status_filter == 'ACCEPTED' %}selected{% endif %}>ACCEPTED</option>
+            <option value="DISPATCHED" {% if status_filter == 'DISPATCHED' %}selected{% endif %}>DISPATCHED</option>
+            <option value="IN TRANSIT" {% if status_filter == 'IN TRANSIT' %}selected{% endif %}>IN TRANSIT</option>
+            <option value="ARRIVED" {% if status_filter == 'ARRIVED' %}selected{% endif %}>ARRIVED</option>
+            <option value="OUT FOR DELIVERY" {% if status_filter == 'OUT FOR DELIVERY' %}selected{% endif %}>OUT FOR DELIVERY</option>
+            <option value="DELIVERED" {% if status_filter == 'DELIVERED' %}selected{% endif %}>DELIVERED</option>
+            <option value="POSSIBLE DELAY" {% if status_filter == 'POSSIBLE DELAY' %}selected{% endif %}>POSSIBLE DELAY</option>
+        </select>
+        
+        <button type="submit" class="btn btn-primary">Filter</button>
+        {% if search or status_filter %}
+            <a href="{{ url_for('shipments') }}" class="btn btn-secondary">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Shipments Table Card -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">All Shipments List ({{ shipments|length }})</div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Tracking Number</th>
+                    <th>Sender & Receiver</th>
+                    <th>Service & Weight</th>
+                    <th>Current Location</th>
+                    <th>Status</th>
+                    <th>Booking Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ship in shipments %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--accent); font-family: var(--font-heading); font-size: 1rem;">
+                            {{ ship.tracking_number }}
+                        </strong>
+                    </td>
+                    <td>
+                        <div>From: <strong>{{ ship.sender_name }}</strong> ({{ ship.sender_city }})</div>
+                        <div style="color: var(--text-muted); font-size: 0.82rem;">To: <strong>{{ ship.receiver_name }}</strong> ({{ ship.receiver_city }})</div>
+                    </td>
+                    <td>
+                        <span class="badge badge-secondary">{{ ship.service_type }}</span>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">{{ ship.weight }} kg | ${{ "%.2f"|format(ship.total_amount) }}</div>
+                    </td>
+                    <td>📍 {{ ship.current_location }}</td>
+                    <td>
+                        {% if ship.status == 'DELIVERED' %}
+                            <span class="badge badge-success">DELIVERED</span>
+                        {% elif ship.status == 'IN TRANSIT' %}
+                            <span class="badge badge-info">IN TRANSIT</span>
+                        {% elif ship.status == 'POSSIBLE DELAY' %}
+                            <span class="badge badge-danger">POSSIBLE DELAY</span>
+                        {% else %}
+                            <span class="badge badge-warning">{{ ship.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ ship.booking_date.split(' ')[0] }}</td>
+                    <td>
+                        <a href="{{ url_for('shipment_details', tracking_number=ship.tracking_number) }}" class="btn btn-secondary btn-sm">Manage / Track</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 32px;">No matching shipment records.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

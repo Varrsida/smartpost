@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Login – SmartPost Management Console{% endblock %}
+
+{% block public_content %}
+<div class="login-wrapper" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);">
+    <div style="width: 100%; max-width: 440px;">
+        <div style="text-align: center; margin-bottom: 28px;">
+            <a href="/" class="smartpost-logo" style="margin-bottom: 16px;">
+                <div class="logo-icon">📮</div>
+                <div class="logo-text">SmartPost</div>
+            </a>
+            <h2 style="font-size: 1.8rem; margin-top: 10px;">Welcome Back</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Login to continue to SmartPost Portal</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <span>{{ message }}</span>
+                            <button type="button" class="alert-close" onclick="this.parentElement.remove()">×</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="card" style="padding: 32px;">
+            <form action="{{ url_for('login') }}" method="POST">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" placeholder="Enter username..." required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <label class="form-label" style="margin-bottom: 0;">Password</label>
+                        <button type="button" class="toggle-password" data-target="password" style="background: none; border: none; color: var(--accent); font-size: 0.8rem; cursor: pointer;">👁️ Show</button>
+                    </div>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter password..." required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">System Role</label>
+                    <select name="role" class="form-select" required>
+                        <option value="Admin">Admin (Full Control)</option>
+                        <option value="Employee">Employee (Postal Counter)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; margin-top: 10px;">LOGIN</button>
+                <a href="/" class="btn btn-secondary" style="width: 100%; padding: 14px; margin-top: 12px;">BACK TO HOME</a>
+            </form>
+        </div>
+
+        <!-- Demo Credentials Card -->
+        <div class="card" style="padding: 20px; border-style: dashed; background: rgba(0,0,0,0.3);">
+            <div style="font-weight: 700; font-size: 0.88rem; color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                <span>🔑</span> Demo Access Credentials:
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.85rem;">
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                    <div style="font-weight: 700; color: #ffffff;">Admin Role</div>
+                    <div style="color: var(--text-muted);">User: <strong style="color: var(--accent);">admin</strong></div>
+                    <div style="color: var(--text-muted);">Pass: <strong style="color: var(--accent);">admin123</strong></div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                    <div style="font-weight: 700; color: #ffffff;">Employee Role</div>
+                    <div style="color: var(--text-muted);">User: <strong style="color: var(--accent);">employee</strong></div>
+                    <div style="color: var(--text-muted);">Pass: <strong style="color: var(--accent);">employee123</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}AI Delivery Delay Prediction – SmartPost{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 28px;">
+    <div style="display: inline-block; padding: 4px 12px; border-radius: 50px; background: var(--accent-light); border: 1px solid var(--border-color); color: var(--accent); font-weight: 700; font-size: 0.8rem; margin-bottom: 10px;">
+        🤖 Machine Learning Core (RandomForestClassifier)
+    </div>
+    <h1 style="font-size: 2rem; margin-bottom: 6px;">Smart Delivery Delay Prediction</h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">Utilize trained Random Forest AI models to evaluate parcel transit risk and prevent delivery bottlenecks.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
+    
+    <!-- PREDICTION INPUT FORM -->
+    <div class="card" style="border-color: var(--accent);">
+        <div class="card-header">
+            <div class="card-title">🎛️ Input Shipment Parameters</div>
+        </div>
+
+        <form action="{{ url_for('prediction') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Tracking Number (Optional Reference)</label>
+                <input type="text" name="tracking_number" class="form-control" placeholder="e.g. SP202608140005">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Service Type</label>
+                    <select name="service_type" class="form-select">
+                        <option value="1">Ordinary Post</option>
+                        <option value="2">Speed Post</option>
+                        <option value="3">Registered Post</option>
+                        <option value="4">Parcel</option>
+                        <option value="5">Express Parcel</option>
+                        <option value="6">International Parcel</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Weight (kg)</label>
+                    <input type="number" name="weight" step="0.1" min="0.1" class="form-control" value="5.0" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Transit Distance (km)</label>
+                    <input type="number" name="distance" min="10" max="5000" class="form-control" value="850" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Estimated Processing Days</label>
+                    <input type="number" name="processing_days" min="1" max="15" class="form-control" value="3" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Destination Zone Type</label>
+                    <select name="destination_type" class="form-select">
+                        <option value="0">Urban Metro</option>
+                        <option value="1">Semi-Urban</option>
+                        <option value="2">Rural Region</option>
+                        <option value="3">Remote Island / Mountain</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Historical Hub Delay Rate (0.0 to 0.5)</label>
+                    <input type="number" name="previous_delay_rate" step="0.05" min="0.0" max="0.5" class="form-control" value="0.15" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Depot Workload Index (1-10)</label>
+                    <input type="number" name="workload" min="1" max="10" class="form-control" value="7" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Weather Risk</label>
+                    <select name="weather_risk" class="form-select">
+                        <option value="0">Low Risk (Clear)</option>
+                        <option value="1">Medium Risk (Rain / Fog)</option>
+                        <option value="2">High Risk (Storm / Severe)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Holiday / Surge Period</label>
+                <select name="holiday_period" class="form-select">
+                    <option value="0">No (Normal Operations)</option>
+                    <option value="1">Yes (Festive / Peak Surge)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.05rem;">
+                ⚡ PREDICT DELIVERY RISK
+            </button>
+        </form>
+    </div>
+
+    <!-- PREDICTION OUTPUT RESULT PANEL -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        {% if prediction_result %}
+            <div class="card" style="padding: 32px; border-color: {% if prediction_result.result == 'POSSIBLE DELAY' %}#ef4444{% else %}#10b981{% endif %}; background: linear-gradient(135deg, var(--bg-card) 0%, {% if prediction_result.result == 'POSSIBLE DELAY' %}rgba(239, 68, 68, 0.15){% else %}rgba(16, 185, 129, 0.15){% endif %} 100%);">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em;">AI Inference Classification</div>
+                    
+                    <div style="font-size: 2.4rem; font-weight: 800; font-family: var(--font-heading); color: {% if prediction_result.result == 'POSSIBLE DELAY' %}#f87171{% else %}#34d399{% endif %}; margin: 8px 0;">
+                        {{ prediction_result.result }}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; text-align: center;">
+                    <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 10px;">
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">MODEL CONFIDENCE</div>
+                        <div style="font-size: 1.6rem; font-weight: 800; color: var(--accent);">{{ prediction_result.confidence }}%</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 10px;">
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">RISK RATING</div>
+                        <div style="font-size: 1.6rem; font-weight: 800; color: {% if prediction_result.risk_level == 'HIGH' %}#ef4444{% elif prediction_result.risk_level == 'MEDIUM' %}#f59e0b{% else %}#10b981{% endif %};">
+                            {{ prediction_result.risk_level }}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.3); padding: 18px; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h4 style="color: var(--accent); margin-bottom: 8px;">💡 Operational Recommendation</h4>
+                    <p style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6;">
+                        {{ prediction_result.recommendation }}
+                    </p>
+                </div>
+            </div>
+        {% else %}
+            <div class="card" style="padding: 40px; text-align: center; justify-content: center; display: flex; flex-direction: column; align-items: center; min-height: 350px;">
+                <div style="font-size: 3.5rem; margin-bottom: 16px;">🤖</div>
+                <h3 style="margin-bottom: 10px;">AI Model Ready</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 400px;">
+                    Fill in the shipment factors on the left and click "Predict Delivery Risk" to compute real-time delay probability.
+                </p>
+            </div>
+        {% endif %}
+
+        <!-- MODEL ARCHITECTURE EXPLANATION CARD -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">ℹ️ Model Specifications</div>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6;">
+                <p style="margin-bottom: 8px;">
+                    • <strong>Algorithm:</strong> Scikit-learn RandomForestClassifier (100 Estimators)
+                </p>
+                <p style="margin-bottom: 8px;">
+                    • <strong>Features Analyzed:</strong> Service Category, Package Weight, Distance, Processing Speed, Location Zone, Historical Hub Delay, Workload Surge, Weather Risk, Holiday Surge.
+                </p>
+                <p>
+                    • <strong>Model Artifact:</strong> Saved as <code>model/delivery_delay_model.pkl</code> via joblib.
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

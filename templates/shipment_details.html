@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Shipment #{{ shipment.tracking_number }} – SmartPost{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+    <div>
+        <h1 style="font-size: 2rem; margin-bottom: 6px;">Shipment Details</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Tracking ID: <strong style="color: var(--accent);">{{ shipment.tracking_number }}</strong></p>
+    </div>
+    <a href="{{ url_for('shipments') }}" class="btn btn-secondary">← Back to Shipments</a>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+    
+    <!-- LEFT COLUMN: SHIPMENT & SENDER/RECEIVER -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📦 Package Information</div>
+                <span class="badge badge-info">{{ shipment.status }}</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.92rem;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Service Type:</span>
+                    <strong>{{ shipment.service_type }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Item Category:</span>
+                    <strong>{{ shipment.item_type }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Package Weight:</span>
+                    <strong>{{ shipment.weight }} kg</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Quantity:</span>
+                    <strong>{{ shipment.quantity }} item(s)</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Declared Item Value:</span>
+                    <strong>${{ "%.2f"|format(shipment.declared_value) }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                    <span style="color: var(--text-muted);">Total Postage Paid:</span>
+                    <strong style="color: var(--accent); font-size: 1.1rem;">${{ "%.2f"|format(shipment.total_amount) }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Booking Timestamp:</span>
+                    <span>{{ shipment.booking_date }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Expected Delivery Date:</span>
+                    <span style="color: #34d399; font-weight: 700;">{{ shipment.expected_delivery_date }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">👥 Address Details</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.9rem;">
+                <div style="background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px;">
+                    <h5 style="color: var(--accent); margin-bottom: 6px;">Sender</h5>
+                    <div style="font-weight: 700;">{{ shipment.sender_name }}</div>
+                    <div>📞 {{ shipment.sender_phone }}</div>
+                    <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 4px;">
+                        {{ shipment.sender_address }}<br>
+                        {{ shipment.sender_city }}, {{ shipment.sender_state }} {{ shipment.sender_postal_code }}
+                    </div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px;">
+                    <h5 style="color: var(--accent); margin-bottom: 6px;">Receiver</h5>
+                    <div style="font-weight: 700;">{{ shipment.receiver_name }}</div>
+                    <div>📞 {{ shipment.receiver_phone }}</div>
+                    <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 4px;">
+                        {{ shipment.receiver_address }}<br>
+                        {{ shipment.receiver_city }}, {{ shipment.receiver_state }} {{ shipment.receiver_postal_code }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: STATUS UPDATE & AUDIT HISTORY -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        
+        <!-- STATUS UPDATE FORM -->
+        <div class="card" style="border-color: var(--accent);">
+            <div class="card-header">
+                <div class="card-title">🔄 Update Shipment Status</div>
+            </div>
+
+            <form action="{{ url_for('update_shipment_status', tracking_number=shipment.tracking_number) }}" method="POST">
+                <div class="form-group">
+                    <label class="form-label">New Status</label>
+                    <select name="status" class="form-select" required>
+                        <option value="BOOKED" {% if shipment.status == 'BOOKED' %}selected{% endif %}>BOOKED</option>
+                        <option value="ACCEPTED" {% if shipment.status == 'ACCEPTED' %}selected{% endif %}>ACCEPTED</option>
+                        <option value="DISPATCHED" {% if shipment.status == 'DISPATCHED' %}selected{% endif %}>DISPATCHED</option>
+                        <option value="IN TRANSIT" {% if shipment.status == 'IN TRANSIT' %}selected{% endif %}>IN TRANSIT</option>
+                        <option value="ARRIVED" {% if shipment.status == 'ARRIVED' %}selected{% endif %}>ARRIVED</option>
+                        <option value="OUT FOR DELIVERY" {% if shipment.status == 'OUT FOR DELIVERY' %}selected{% endif %}>OUT FOR DELIVERY</option>
+                        <option value="DELIVERED" {% if shipment.status == 'DELIVERED' %}selected{% endif %}>DELIVERED</option>
+                        <option value="POSSIBLE DELAY" {% if shipment.status == 'POSSIBLE DELAY' %}selected{% endif %}>POSSIBLE DELAY</option>
+                        <option value="RETURNED" {% if shipment.status == 'RETURNED' %}selected{% endif %}>RETURNED</option>
+                        <option value="CANCELLED" {% if shipment.status == 'CANCELLED' %}selected{% endif %}>CANCELLED</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Current Hub / Location *</label>
+                    <input type="text" name="location" class="form-control" placeholder="e.g. Springfield Sorting Center" value="{{ shipment.current_location }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Remarks / Dispatch Notes</label>
+                    <input type="text" name="remarks" class="form-control" placeholder="e.g. Scanned at regional junction dock 4">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Record Status Change</button>
+            </form>
+        </div>
+
+        <!-- TRACKING TIMELINE -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📜 Tracking History Audit Trail</div>
+            </div>
+
+            <div class="tracking-timeline">
+                {% for event in tracking_history %}
+                <div class="timeline-item completed">
+                    <div class="timeline-dot">✓</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title" style="color: var(--accent);">{{ event.status }}</div>
+                        <div style="font-size: 0.88rem; font-weight: 600;">📍 {{ event.location }}</div>
+                        {% if event.remarks %}
+                            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">{{ event.remarks }}</div>
+                        {% endif %}
+                        <div class="timeline-date">{{ event.updated_at }}</div>
+                    </div>
+                </div>
+                {% else %}
+                <div style="color: var(--text-muted); font-size: 0.9rem;">No status history recorded yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

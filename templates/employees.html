@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Management – SmartPost{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <h1 style="font-size: 2rem; margin-bottom: 6px;">Employee Directory</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Manage post office staff, postal assistants, counter clerks, and supervisors.</p>
+    </div>
+    <a href="{{ url_for('add_employee') }}" class="btn btn-primary">+ Add New Employee</a>
+</div>
+
+<!-- Search Bar -->
+<div class="card" style="padding: 16px 20px; margin-bottom: 24px;">
+    <form action="{{ url_for('employees') }}" method="GET" style="display: flex; gap: 12px;">
+        <input type="text" name="search" class="form-control" placeholder="Search employee name, code, designation, or branch..." value="{{ search }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+        {% if search %}
+            <a href="{{ url_for('employees') }}" class="btn btn-secondary">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Employee Table -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">Staff Members Directory ({{ employees|length }})</div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Emp Code</th>
+                    <th>Full Name</th>
+                    <th>Designation</th>
+                    <th>Branch Office</th>
+                    <th>Contact Info</th>
+                    <th>Joining Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in employees %}
+                <tr>
+                    <td><strong>{{ emp.employee_code }}</strong></td>
+                    <td>
+                        <strong style="color: var(--accent); font-size: 0.95rem;">{{ emp.name }}</strong>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">@{{ emp.username }}</div>
+                    </td>
+                    <td><span class="badge badge-secondary">{{ emp.designation }}</span></td>
+                    <td>{{ emp.branch }}</td>
+                    <td>
+                        <div>📞 {{ emp.phone }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">✉️ {{ emp.email }}</div>
+                    </td>
+                    <td>{{ emp.joining_date }}</td>
+                    <td>
+                        {% if emp.status == 'ACTIVE' %}
+                            <span class="badge badge-success">ACTIVE</span>
+                        {% else %}
+                            <span class="badge badge-danger">INACTIVE</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form action="{{ url_for('toggle_employee_status', id=emp.id) }}" method="POST">
+                            <button type="submit" class="btn btn-secondary btn-sm">
+                                {% if emp.status == 'ACTIVE' %}Deactivate{% else %}Activate{% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 32px;">No employee records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

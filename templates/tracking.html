@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Track Your Shipment – SmartPost{% endblock %}
+
+{% block content %}
+<div style="max-width: 850px; margin: 0 auto;">
+    
+    <div style="text-align: center; margin-bottom: 36px;">
+        <div style="font-size: 3rem; margin-bottom: 12px;">📍</div>
+        <h1 style="font-size: 2.4rem; margin-bottom: 8px;">Track Your Shipment</h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem;">Enter your SmartPost tracking number for instant real-time delivery status updates.</p>
+    </div>
+
+    <!-- TRACKING SEARCH BOX -->
+    <div class="card" style="padding: 32px; border-color: var(--accent); background: linear-gradient(135deg, var(--bg-card) 0%, rgba(217, 119, 6, 0.15) 100%);">
+        <form action="{{ url_for('tracking') }}" method="POST" style="display: flex; gap: 14px; flex-wrap: wrap;">
+            <input type="text" name="tracking_number" class="form-control" style="flex: 1; min-width: 260px; padding: 16px; font-size: 1.1rem; font-family: var(--font-heading);" placeholder="Enter Tracking ID (e.g. SP202608010001)" value="{{ tracking_number }}" required autofocus>
+            <button type="submit" class="btn btn-primary" style="padding: 16px 36px; font-size: 1.1rem;">TRACK</button>
+        </form>
+
+        <div style="margin-top: 14px; font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 12px; align-items: center;">
+            <span>Sample Test Numbers:</span>
+            <a href="{{ url_for('tracking', tracking_number='SP202608010001') }}" style="color: var(--accent); font-weight: 700;">SP202608010001</a>
+            <a href="{{ url_for('tracking', tracking_number='SP202608050002') }}" style="color: var(--accent); font-weight: 700;">SP202608050002</a>
+            <a href="{{ url_for('tracking', tracking_number='SP202608140005') }}" style="color: var(--accent); font-weight: 700;">SP202608140005</a>
+        </div>
+    </div>
+
+    {% if searched %}
+        {% if shipment %}
+            <!-- SHIPMENT SUMMARY CARD -->
+            <div class="card" style="margin-top: 28px;">
+                <div class="card-header">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Tracking Number</div>
+                        <div style="font-size: 1.6rem; font-weight: 800; color: var(--accent); font-family: var(--font-heading);">{{ shipment.tracking_number }}</div>
+                    </div>
+                    <div>
+                        {% if shipment.status == 'DELIVERED' %}
+                            <span class="badge badge-success" style="font-size: 0.9rem; padding: 8px 16px;">DELIVERED</span>
+                        {% elif shipment.status == 'POSSIBLE DELAY' %}
+                            <span class="badge badge-danger" style="font-size: 0.9rem; padding: 8px 16px;">POSSIBLE DELAY</span>
+                        {% else %}
+                            <span class="badge badge-info" style="font-size: 0.9rem; padding: 8px 16px;">{{ shipment.status }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; font-size: 0.9rem; margin-bottom: 24px;">
+                    <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px;">
+                        <div style="color: var(--text-muted); font-size: 0.78rem;">SERVICE TYPE</div>
+                        <div style="font-weight: 700;">{{ shipment.service_type }}</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px;">
+                        <div style="color: var(--text-muted); font-size: 0.78rem;">CURRENT LOCATION</div>
+                        <div style="font-weight: 700;">📍 {{ shipment.current_location }}</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px;">
+                        <div style="color: var(--text-muted); font-size: 0.78rem;">BOOKING DATE</div>
+                        <div style="font-weight: 700;">{{ shipment.booking_date.split(' ')[0] }}</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px;">
+                        <div style="color: var(--text-muted); font-size: 0.78rem;">EXPECTED DELIVERY</div>
+                        <div style="font-weight: 700; color: #34d399;">{{ shipment.expected_delivery_date.split(' ')[0] }}</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; font-size: 0.88rem;">
+                    <div>
+                        <span style="color: var(--text-muted);">Sender:</span> <strong>{{ shipment.sender_name }}</strong> ({{ shipment.sender_city }})
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted);">Receiver:</span> <strong>{{ shipment.receiver_name }}</strong> ({{ shipment.receiver_city }})
+                    </div>
+                </div>
+
+                <!-- VERTICAL TIMELINE -->
+                <h3 style="margin-bottom: 20px; font-size: 1.2rem;">Live Delivery Journey Timeline</h3>
+                <div class="tracking-timeline">
+                    {% for event in history %}
+                    <div class="timeline-item completed">
+                        <div class="timeline-dot">✓</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title" style="color: var(--accent);">{{ event.status }}</div>
+                            <div style="font-weight: 600; font-size: 0.9rem;">📍 {{ event.location }}</div>
+                            {% if event.remarks %}
+                                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">{{ event.remarks }}</div>
+                            {% endif %}
+                            <div class="timeline-date">{{ event.updated_at }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        {% else %}
+            <!-- NOT FOUND ERROR BOX -->
+            <div class="card" style="margin-top: 28px; text-align: center; padding: 40px; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1);">
+                <div style="font-size: 3rem; margin-bottom: 12px;">⚠️</div>
+                <h3 style="color: #f87171; margin-bottom: 8px;">Tracking Number Not Found</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 500px; margin: 0 auto;">
+                    Tracking number "<strong>{{ tracking_number }}</strong>" does not exist in our postal database. Please check the digits and try again.
+                </p>
+            </div>
+        {% endif %}
+    {% endif %}
+
+</div>
+{% endblock %}

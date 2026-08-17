@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Complaint Management – SmartPost{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <h1 style="font-size: 2rem; margin-bottom: 6px;">Complaint Management</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Track, resolve, and update customer service tickets and grievances.</p>
+    </div>
+    <a href="{{ url_for('add_complaint') }}" class="btn btn-primary">+ Register New Complaint</a>
+</div>
+
+<!-- Status Filter Card -->
+<div class="card" style="padding: 16px 20px; margin-bottom: 24px;">
+    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <span style="font-weight: 700; font-size: 0.9rem;">Filter Status:</span>
+        <a href="{{ url_for('complaints') }}" class="btn btn-secondary btn-sm {% if not status_filter %}btn-primary{% endif %}">All</a>
+        <a href="{{ url_for('complaints', status='OPEN') }}" class="btn btn-secondary btn-sm {% if status_filter == 'OPEN' %}btn-primary{% endif %}">OPEN</a>
+        <a href="{{ url_for('complaints', status='IN REVIEW') }}" class="btn btn-secondary btn-sm {% if status_filter == 'IN REVIEW' %}btn-primary{% endif %}">IN REVIEW</a>
+        <a href="{{ url_for('complaints', status='RESOLVED') }}" class="btn btn-secondary btn-sm {% if status_filter == 'RESOLVED' %}btn-primary{% endif %}">RESOLVED</a>
+        <a href="{{ url_for('complaints', status='CLOSED') }}" class="btn btn-secondary btn-sm {% if status_filter == 'CLOSED' %}btn-primary{% endif %}">CLOSED</a>
+    </div>
+</div>
+
+<!-- Complaints Grid / List -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
+    {% for c in complaints %}
+    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-color: {% if c.priority == 'CRITICAL' %}#ef4444{% elif c.priority == 'HIGH' %}#f97316{% else %}var(--border-color){% endif %};">
+        <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <span class="badge {% if c.priority == 'CRITICAL' %}badge-danger{% elif c.priority == 'HIGH' %}badge-warning{% else %}badge-secondary{% endif %}">
+                    Priority: {{ c.priority }}
+                </span>
+                <span class="badge {% if c.status == 'OPEN' %}badge-danger{% elif c.status == 'IN REVIEW' %}badge-warning{% else %}badge-success{% endif %}">
+                    {{ c.status }}
+                </span>
+            </div>
+
+            <h3 style="font-size: 1.2rem; margin-bottom: 6px;">{{ c.complaint_type }}</h3>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+                By: <strong>{{ c.customer_name }}</strong> | Tracking: <a href="{{ url_for('tracking', tracking_number=c.tracking_number) }}" style="color: var(--accent);">{{ c.tracking_number }}</a>
+            </div>
+
+            <p style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 8px; font-size: 0.9rem; color: var(--text-main); margin-bottom: 14px; line-height: 1.5;">
+                "{{ c.description }}"
+            </p>
+
+            {% if c.resolution %}
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 14px;">
+                    <strong style="color: #34d399;">Resolution:</strong> {{ c.resolution }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 10px;">
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Logged: {{ c.created_date }}</div>
+            
+            <form action="{{ url_for('update_complaint', id=c.id) }}" method="POST" style="display: flex; gap: 8px;">
+                <select name="status" class="form-select" style="padding: 6px 10px; font-size: 0.82rem;">
+                    <option value="OPEN" {% if c.status == 'OPEN' %}selected{% endif %}>OPEN</option>
+                    <option value="IN REVIEW" {% if c.status == 'IN REVIEW' %}selected{% endif %}>IN REVIEW</option>
+                    <option value="RESOLVED" {% if c.status == 'RESOLVED' %}selected{% endif %}>RESOLVED</option>
+                    <option value="CLOSED" {% if c.status == 'CLOSED' %}selected{% endif %}>CLOSED</option>
+                </select>
+                <input type="text" name="resolution" class="form-control" style="padding: 6px 10px; font-size: 0.82rem;" placeholder="Resolution note..." value="{{ c.resolution if c.resolution else '' }}">
+                <button type="submit" class="btn btn-primary btn-sm">Update</button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+        <div style="font-size: 2.5rem; margin-bottom: 10px;">💬</div>
+        <h3>No Complaints Found</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">There are currently no customer complaints under this filter status.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

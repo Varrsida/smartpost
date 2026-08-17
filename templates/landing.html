@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+
+{% block title %}SmartPost – AI-Powered Post Office Management and Smart Delivery System{% endblock %}
+
+{% block public_content %}
+<div class="landing-page-wrapper">
+    <!-- Landing Header Navigation -->
+    <nav class="landing-navbar" style="display: flex; align-items: center; justify-content: space-between; padding: 20px 5%; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px);">
+        <a href="/" class="smartpost-logo">
+            <div class="logo-icon">📮</div>
+            <div class="logo-text">SmartPost</div>
+            <div class="logo-badge">AI</div>
+        </a>
+
+        <div class="landing-nav-links" style="display: flex; gap: 28px; align-items: center;">
+            <a href="#home" style="color: var(--text-main); font-weight: 600;">Home</a>
+            <a href="#about" style="color: var(--text-main); font-weight: 600;">About</a>
+            <a href="#services" style="color: var(--text-main); font-weight: 600;">Services</a>
+            <a href="#technology" style="color: var(--text-main); font-weight: 600;">Technology</a>
+            <a href="#contact" style="color: var(--text-main); font-weight: 600;">Contact</a>
+            <a href="{{ url_for('login') }}" class="btn btn-primary" style="padding: 10px 22px;">GET STARTED</a>
+        </div>
+    </nav>
+
+    <!-- Flash Messages on Landing -->
+    <div style="max-width: 1200px; margin: 20px auto 0; padding: 0 20px;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <span>{{ message }}</span>
+                        <button type="button" class="alert-close" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" style="padding: 80px 5%; min-height: 85vh; display: flex; align-items: center; justify-content: space-between; gap: 40px; background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);">
+        <div style="flex: 1; max-width: 650px;">
+            <div style="display: inline-block; padding: 6px 16px; border-radius: 50px; background: var(--accent-light); border: 1px solid var(--border-color); color: var(--accent); font-weight: 700; font-size: 0.85rem; margin-bottom: 24px;">
+                🚀 AI-Powered Postal Logistics 2.0
+            </div>
+            <h1 style="font-size: 3.5rem; line-height: 1.15; margin-bottom: 16px; font-weight: 800; color: #ffffff;">SmartPost</h1>
+            <h2 style="font-size: 1.6rem; color: var(--accent); margin-bottom: 20px; font-weight: 600;">
+                AI-Powered Post Office Management and Smart Delivery System
+            </h2>
+            <p style="font-size: 1.15rem; color: var(--text-muted); margin-bottom: 36px; line-height: 1.7;">
+                Manage customers, book shipments, track parcels and use intelligent delivery insights from one modern, technology-driven platform.
+            </p>
+            <div style="display: flex; gap: 18px; flex-wrap: wrap;">
+                <a href="{{ url_for('login') }}" class="btn btn-primary" style="padding: 16px 36px; font-size: 1.05rem;">GET STARTED</a>
+                <a href="#services" class="btn btn-secondary" style="padding: 16px 36px; font-size: 1.05rem;">EXPLORE SERVICES</a>
+            </div>
+        </div>
+
+        <div style="flex: 1; display: flex; justify-content: center; position: relative;">
+            <div class="card" style="padding: 12px; background: var(--bg-card); border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border-color); max-width: 520px; width: 100%;">
+                <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80" alt="Modern Postal Counter & Parcel Logistics" style="width: 100%; height: 380px; object-fit: cover; border-radius: 16px;">
+                <div style="padding: 16px 12px 8px; display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="font-weight: 700; font-size: 1rem;">Digital Post Counter</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Real-time dispatch & dynamic tracking</div>
+                    </div>
+                    <span class="badge badge-success">Live Operations</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" style="padding: 80px 5%; background: var(--bg-secondary);">
+        <div style="text-align: center; max-width: 700px; margin: 0 auto 50px;">
+            <h2 style="font-size: 2.2rem; margin-bottom: 12px;">Postal & Parcel Services</h2>
+            <p style="color: var(--text-muted); font-size: 1.05rem;">Comprehensive postal solutions tailored for fast, reliable, and secure nationwide delivery.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <div class="card" style="text-align: center; padding: 32px 24px;">
+                <div style="font-size: 2.5rem; margin-bottom: 16px;">⚡</div>
+                <h3 style="margin-bottom: 12px;">Speed Post</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Time-sensitive priority delivery service with real-time express tracking across all hubs.</p>
+                <span class="badge badge-info">Fastest Delivery</span>
+            </div>
+
+            <div class="card" style="text-align: center; padding: 32px 24px;">
+                <div style="font-size: 2.5rem; margin-bottom: 16px;">🛡️</div>
+                <h3 style="margin-bottom: 12px;">Registered Post</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">High-security mail transmission with legal proof of booking, signature, and delivery audit.</p>
+                <span class="badge badge-success">High Security</span>
+            </div>
+
+            <div class="card" style="text-align: center; padding: 32px 24px;">
+                <div style="font-size: 2.5rem; margin-bottom: 16px;">📦</div>
+                <h3 style="margin-bottom: 12px;">Parcel Delivery</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Economical heavy package shipment with automated weight-based postage calculation.</p>
+                <span class="badge badge-warning">Bulk Transport</span>
+            </div>
+
+            <div class="card" style="text-align: center; padding: 32px 24px;">
+                <div style="font-size: 2.5rem; margin-bottom: 16px;">✉️</div>
+                <h3 style="margin-bottom: 12px;">Letter Services</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Domestic letter and document transmission supporting standard postal codes.</p>
+                <span class="badge badge-secondary">Standard Mail</span>
+            </div>
+
+            <div class="card" style="text-align: center; padding: 32px 24px;">
+                <div style="font-size: 2.5rem; margin-bottom: 16px;">📍</div>
+                <h3 style="margin-bottom: 12px;">Shipment Tracking</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Interactive tracking engine providing vertical progress timeline for every parcel.</p>
+                <span class="badge badge-info">Real-Time Updates</span>
+            </div>
+
+            <div class="card" style="text-align: center; padding: 32px 24px;">
+                <div style="font-size: 2.5rem; margin-bottom: 16px;">🎧</div>
+                <h3 style="margin-bottom: 12px;">Customer Support</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Integrated complaint management system ensuring rapid issue resolution.</p>
+                <span class="badge badge-success">24/7 Service</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visual Postal Showcase Section -->
+    <section style="padding: 80px 5%; background: var(--bg-primary);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            <div class="card" style="padding: 10px; text-align: center;">
+                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80" alt="Parcel Warehouse Sorting" style="width: 100%; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 12px;">
+                <h4 style="margin-bottom: 4px;">Smart Parcel Sorting</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Automated hub routing & weight verification.</p>
+            </div>
+            <div class="card" style="padding: 10px; text-align: center;">
+                <img src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&w=600&q=80" alt="Delivery Vehicle Logistics" style="width: 100%; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 12px;">
+                <h4 style="margin-bottom: 4px;">Fleet Transport</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Direct door-to-door delivery vehicles.</p>
+            </div>
+            <div class="card" style="padding: 10px; text-align: center;">
+                <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=600&q=80" alt="Postage & Stamp Processing" style="width: 100%; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 12px;">
+                <h4 style="margin-bottom: 4px;">Automated Postage</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Precise pricing rules based on service tier.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About SmartPost -->
+    <section id="about" style="padding: 80px 5%; background: var(--bg-secondary);">
+        <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+            <h2 style="font-size: 2.2rem; text-align: center; margin-bottom: 16px;">About SmartPost</h2>
+            <div class="card" style="padding: 36px; line-height: 1.8;">
+                <p style="font-size: 1.1rem; margin-bottom: 20px;">
+                    <strong>SmartPost</strong> is a modern, web-based Post Office Management System built to digitize postal operations, streamline customer bookings, automate postage calculations, and deliver artificial intelligence insights into shipment delays.
+                </p>
+                <p style="font-size: 1rem; color: var(--text-muted);">
+                    By combining reliable database storage (SQLite) with machine learning algorithms (Random Forest), SmartPost empowers postal administrators and counter clerks to predict delivery risks in real time, minimize bottleneck delays, and maintain transparent audit tracking for every parcel.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Stack -->
+    <section id="technology" style="padding: 80px 5%; background: var(--bg-primary);">
+        <div style="text-align: center; max-width: 700px; margin: 0 auto 50px;">
+            <h2 style="font-size: 2.2rem; margin-bottom: 12px;">Technology Stack</h2>
+            <p style="color: var(--text-muted); font-size: 1.05rem;">Engineered cleanly without bloated frameworks using robust academic core tech.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <div class="card" style="text-align: center; padding: 24px;">
+                <div style="font-size: 2rem; margin-bottom: 10px;">🌐</div>
+                <h4>HTML5 & CSS3</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Semantic layouts & 13 page color themes</p>
+            </div>
+            <div class="card" style="text-align: center; padding: 24px;">
+                <div style="font-size: 2rem; margin-bottom: 10px;">⚡</div>
+                <h4>Vanilla JS</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Dynamic DOM & client calculations</p>
+            </div>
+            <div class="card" style="text-align: center; padding: 24px;">
+                <div style="font-size: 2rem; margin-bottom: 10px;">🐍</div>
+                <h4>Python Flask</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Lightweight WSGI web server backend</p>
+            </div>
+            <div class="card" style="text-align: center; padding: 24px;">
+                <div style="font-size: 2rem; margin-bottom: 10px;">💾</div>
+                <h4>SQLite3</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Relational database with parameterized queries</p>
+            </div>
+            <div class="card" style="text-align: center; padding: 24px;">
+                <div style="font-size: 2rem; margin-bottom: 10px;">🤖</div>
+                <h4>Scikit-Learn</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Random Forest Classifier delay model</p>
+            </div>
+            <div class="card" style="text-align: center; padding: 24px;">
+                <div style="font-size: 2rem; margin-bottom: 10px;">📊</div>
+                <h4>Chart.js CDN</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Interactive analytics charts</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section style="padding: 80px 5%; background: var(--bg-secondary);">
+        <div style="text-align: center; max-width: 700px; margin: 0 auto 50px;">
+            <h2 style="font-size: 2.2rem; margin-bottom: 12px;">How It Works</h2>
+            <p style="color: var(--text-muted);">6 simple steps from customer registration to final doorstep delivery.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            <div class="card" style="padding: 24px;">
+                <div style="font-weight: 800; color: var(--accent); font-size: 1.4rem; margin-bottom: 8px;">Step 1</div>
+                <h3>Customer Registration</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px;">Register sender details with valid government ID proof.</p>
+            </div>
+            <div class="card" style="padding: 24px;">
+                <div style="font-weight: 800; color: var(--accent); font-size: 1.4rem; margin-bottom: 8px;">Step 2</div>
+                <h3>Postal Booking</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px;">Select service type, enter package weight, and declare item value.</p>
+            </div>
+            <div class="card" style="padding: 24px;">
+                <div style="font-weight: 800; color: var(--accent); font-size: 1.4rem; margin-bottom: 8px;">Step 3</div>
+                <h3>Tracking Generation</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px;">Python dynamically issues a unique tracking ID (e.g. SP202608160001).</p>
+            </div>
+            <div class="card" style="padding: 24px;">
+                <div style="font-weight: 800; color: var(--accent); font-size: 1.4rem; margin-bottom: 8px;">Step 4</div>
+                <h3>Shipment Processing</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px;">Dispatch package through regional sorting hubs and transit depots.</p>
+            </div>
+            <div class="card" style="padding: 24px;">
+                <div style="font-weight: 800; color: var(--accent); font-size: 1.4rem; margin-bottom: 8px;">Step 5</div>
+                <h3>Real-Time Tracking</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px;">Monitor vertical timeline status updates and AI delay alerts.</p>
+            </div>
+            <div class="card" style="padding: 24px;">
+                <div style="font-weight: 800; color: var(--accent); font-size: 1.4rem; margin-bottom: 8px;">Step 6</div>
+                <h3>Successful Delivery</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px;">Final recipient confirmation, digital signature, and closure.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" style="padding: 80px 5%; background: var(--bg-primary);">
+        <div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px;">
+            <div>
+                <h2 style="font-size: 2.2rem; margin-bottom: 16px;">Contact SmartPost</h2>
+                <p style="color: var(--text-muted); margin-bottom: 30px;">Reach out to our central postal management office for inquiries or operational assistance.</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <div style="width: 46px; height: 46px; border-radius: 12px; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">📍</div>
+                        <div>
+                            <div style="font-weight: 700;">Central Address</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">100 SmartPost Plaza, Postal District 1</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <div style="width: 46px; height: 46px; border-radius: 12px; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">📞</div>
+                        <div>
+                            <div style="font-weight: 700;">Helpline & Phone</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">+1 (800) 555-POST (7678)</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <div style="width: 46px; height: 46px; border-radius: 12px; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">✉️</div>
+                        <div>
+                            <div style="font-weight: 700;">Email Address</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">support@smartpost.gov</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <div style="width: 46px; height: 46px; border-radius: 12px; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">🕒</div>
+                        <div>
+                            <div style="font-weight: 700;">Working Hours</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">Mon - Sat: 08:00 AM - 08:00 PM</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 32px;">
+                <h3 style="margin-bottom: 20px;">Send a Direct Message</h3>
+                <form action="{{ url_for('contact') }}" method="POST">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea name="message" rows="4" class="form-control" placeholder="Inquiry details..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="padding: 40px 5%; background: #1a0407; border-top: 1px solid var(--border-color); text-align: center;">
+        <div class="smartpost-logo" style="margin-bottom: 12px;">
+            <div class="logo-icon">📮</div>
+            <div class="logo-text">SmartPost</div>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px;">
+            Smart postal management made simple.
+        </p>
+        <p style="color: rgba(255,255,255,0.4); font-size: 0.8rem;">
+            © 2026 SmartPost – AI-Powered Post Office Management and Smart Delivery System. All rights reserved.
+        </p>
+    </footer>
+</div>
+{% endblock %}

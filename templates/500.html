@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}500 Internal Server Error – SmartPost{% endblock %}
+
+{% block public_content %}
+<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px 20px;">
+    <div style="max-width: 500px;">
+        <div style="font-size: 5rem; font-weight: 800; font-family: var(--font-heading); color: #ef4444; margin-bottom: 0;">500</div>
+        <h2 style="font-size: 1.8rem; margin-bottom: 12px;">Internal Processing Error</h2>
+        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 24px;">
+            An unexpected operational error occurred on the server. Please try again or return to the main dashboard.
+        </p>
+        <a href="/" class="btn btn-primary">Return to Home Page</a>
+    </div>
+</div>
+{% endblock %}

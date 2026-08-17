@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard – SmartPost Management Console{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="margin-bottom: 28px;">
+    <h1 style="font-size: 2rem; margin-bottom: 6px;">SmartPost Dashboard</h1>
+    <p style="color: var(--text-muted); font-size: 0.98rem;">Welcome back, <strong>{{ session.get('name') }}</strong>. Here is today's live postal activity overview.</p>
+</div>
+
+<!-- Quick Actions Banner -->
+<div class="card" style="padding: 16px 24px; margin-bottom: 24px; background: linear-gradient(135deg, var(--bg-card) 0%, rgba(139, 92, 246, 0.2) 100%); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+    <div style="font-weight: 700; font-size: 1.05rem;">🚀 Quick Operations Console:</div>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="{{ url_for('booking') }}" class="btn btn-primary btn-sm">📦 New Booking</a>
+        <a href="{{ url_for('add_customer') }}" class="btn btn-secondary btn-sm">👤 Add Customer</a>
+        <a href="{{ url_for('tracking') }}" class="btn btn-secondary btn-sm">📍 Track Parcel</a>
+        <a href="{{ url_for('add_complaint') }}" class="btn btn-secondary btn-sm">💬 File Complaint</a>
+    </div>
+</div>
+
+<!-- 8 Statistics Cards Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-details">
+            <div class="stat-value">{{ total_customers }}</div>
+            <div class="stat-label">Total Customers</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-details">
+            <div class="stat-value">{{ total_shipments }}</div>
+            <div class="stat-label">Total Shipments</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-details">
+            <div class="stat-value" style="color: #34d399;">{{ delivered_shipments }}</div>
+            <div class="stat-label">Delivered</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-details">
+            <div class="stat-value" style="color: #fbbf24;">{{ pending_shipments }}</div>
+            <div class="stat-label">Pending / Processing</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">🚚</div>
+        <div class="stat-details">
+            <div class="stat-value" style="color: #38bdf8;">{{ in_transit_shipments }}</div>
+            <div class="stat-label">In Transit</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-details">
+            <div class="stat-value">${{ "%.2f"|format(total_revenue) }}</div>
+            <div class="stat-label">Total Postage Revenue</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-details">
+            <div class="stat-value" style="color: #f87171;">{{ open_complaints }}</div>
+            <div class="stat-label">Open Complaints</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-details">
+            <div class="stat-value">{{ today_bookings }}</div>
+            <div class="stat-label">Today's Bookings</div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 28px;">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Shipment Status Distribution</div>
+            <span class="badge badge-info">Real-time DB</span>
+        </div>
+        <div style="height: 260px; position: relative;">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Weekly Postal Revenue Trend</div>
+            <span class="badge badge-success">Financial Analytics</span>
+        </div>
+        <div style="height: 260px; position: relative;">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Shipments Table -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">Recent Postal Bookings</div>
+        <a href="{{ url_for('shipments') }}" class="btn btn-secondary btn-sm">View All Shipments →</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Tracking Number</th>
+                    <th>Sender</th>
+                    <th>Receiver</th>
+                    <th>Service</th>
+                    <th>Destination</th>
+                    <th>Status</th>
+                    <th>Booking Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ship in recent_shipments %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--accent);">{{ ship.tracking_number }}</strong>
+                    </td>
+                    <td>{{ ship.sender_name }}</td>
+                    <td>{{ ship.receiver_name }}</td>
+                    <td><span class="badge badge-secondary">{{ ship.service_type }}</span></td>
+                    <td>{{ ship.receiver_city }}</td>
+                    <td>
+                        {% if ship.status == 'DELIVERED' %}
+                            <span class="badge badge-success">DELIVERED</span>
+                        {% elif ship.status == 'IN TRANSIT' %}
+                            <span class="badge badge-info">IN TRANSIT</span>
+                        {% elif ship.status == 'POSSIBLE DELAY' %}
+                            <span class="badge badge-danger">POSSIBLE DELAY</span>
+                        {% else %}
+                            <span class="badge badge-warning">{{ ship.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ ship.booking_date.split(' ')[0] }}</td>
+                    <td>
+                        <a href="{{ url_for('shipment_details', tracking_number=ship.tracking_number) }}" class="btn btn-secondary btn-sm">Details</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 24px;">No shipments recorded yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Status Chart Data
+    const statusLabels = ['BOOKED', 'ACCEPTED', 'DISPATCHED', 'IN TRANSIT', 'ARRIVED', 'OUT FOR DELIVERY', 'DELIVERED', 'POSSIBLE DELAY'];
+    const statusData = [
+        {{ status_data.get('BOOKED', 0) }},
+        {{ status_data.get('ACCEPTED', 0) }},
+        {{ status_data.get('DISPATCHED', 0) }},
+        {{ status_data.get('IN TRANSIT', 0) }},
+        {{ status_data.get('ARRIVED', 0) }},
+        {{ status_data.get('OUT FOR DELIVERY', 0) }},
+        {{ status_data.get('DELIVERED', 0) }},
+        {{ status_data.get('POSSIBLE DELAY', 0) }}
+    ];
+    const statusColors = ['#f59e0b', '#38bdf8', '#818cf8', '#a78bfa', '#34d399', '#facc15', '#10b981', '#f87171'];
+    
+    initChart('statusChart', 'doughnut', statusLabels, statusData, statusColors, 'Shipment Status');
+
+    // 2. Revenue Trend Chart
+    const revLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const revData = [120.0, 350.5, 210.0, 480.0, 390.0, 520.0, {{ total_revenue }}];
+    initChart('revenueChart', 'line', revLabels, revData, '#a78bfa', 'Revenue ($)');
+});
+</script>
+{% endblock %}

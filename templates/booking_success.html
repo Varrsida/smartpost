@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Successful – Receipt #{{ shipment.tracking_number }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 750px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 28px;" class="no-print">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 2.2rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">✓</div>
+        <h1 style="font-size: 2.2rem; margin-bottom: 6px;">Booking Successful</h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem;">Postal shipment has been accepted into the dispatch queue.</p>
+    </div>
+
+    <!-- Official Postal Booking Receipt Printable Box -->
+    <div class="card" style="padding: 36px; border-color: var(--accent); background: var(--bg-card); position: relative;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; margin-bottom: 24px;">
+            <div class="smartpost-logo">
+                <div class="logo-icon">📮</div>
+                <div class="logo-text">SmartPost</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-weight: 800; font-size: 1.2rem; color: var(--accent);">OFFICIAL RECEIPT</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">Date: {{ shipment.booking_date }}</div>
+            </div>
+        </div>
+
+        <!-- Tracking Badge -->
+        <div style="background: var(--accent-light); border: 1px solid var(--accent); padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 28px;">
+            <div style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; font-weight: 700;">Official Tracking Identification</div>
+            <div style="font-size: 2rem; font-weight: 800; font-family: var(--font-heading); color: #ffffff; letter-spacing: 0.08em; margin: 4px 0;">
+                {{ shipment.tracking_number }}
+            </div>
+            <div style="font-size: 0.85rem; color: var(--accent);">Status: BOOKED | Expected Delivery: {{ shipment.expected_delivery_date.split(' ')[0] }}</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; font-size: 0.95rem;">
+            <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 10px; border: 1px solid var(--border-color);">
+                <h4 style="color: var(--accent); margin-bottom: 8px;">Sender Details</h4>
+                <div><strong>{{ shipment.sender_name }}</strong></div>
+                <div>📞 {{ shipment.sender_phone }}</div>
+                <div>{{ shipment.sender_address }}</div>
+                <div>{{ shipment.sender_city }}, {{ shipment.sender_state }} - {{ shipment.sender_postal_code }}</div>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 10px; border: 1px solid var(--border-color);">
+                <h4 style="color: var(--accent); margin-bottom: 8px;">Receiver Details</h4>
+                <div><strong>{{ shipment.receiver_name }}</strong></div>
+                <div>📞 {{ shipment.receiver_phone }}</div>
+                <div>{{ shipment.receiver_address }}</div>
+                <div>{{ shipment.receiver_city }}, {{ shipment.receiver_state }} - {{ shipment.receiver_postal_code }}</div>
+            </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 20px; margin-bottom: 24px;">
+            <h4 style="margin-bottom: 12px;">Shipment Summary</h4>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; font-size: 0.9rem; text-align: center;">
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                    <div style="color: var(--text-muted); font-size: 0.75rem;">SERVICE</div>
+                    <div style="font-weight: 700;">{{ shipment.service_type }}</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                    <div style="color: var(--text-muted); font-size: 0.75rem;">ITEM TYPE</div>
+                    <div style="font-weight: 700;">{{ shipment.item_type }}</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                    <div style="color: var(--text-muted); font-size: 0.75rem;">WEIGHT</div>
+                    <div style="font-weight: 700;">{{ shipment.weight }} kg</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                    <div style="color: var(--text-muted); font-size: 0.75rem;">DECLARED VALUE</div>
+                    <div style="font-weight: 700;">${{ "%.2f"|format(shipment.declared_value) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">Payment Mode: <strong>{{ payment.payment_mode if payment else 'Cash' }}</strong></div>
+                <div style="font-size: 0.85rem; color: #34d399;">Payment Status: COMPLETED</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Total Paid Postage</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent); font-family: var(--font-heading);">${{ "%.2f"|format(shipment.total_amount) }}</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Actions Buttons -->
+    <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 24px;" class="no-print">
+        <button onclick="window.print()" class="btn btn-primary" style="flex: 1;">🖨️ Print Official Receipt</button>
+        <a href="{{ url_for('tracking', tracking_number=shipment.tracking_number) }}" class="btn btn-secondary" style="flex: 1;">📍 Track Shipment</a>
+        <a href="{{ url_for('booking') }}" class="btn btn-secondary">📦 New Booking</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">📊 Dashboard</a>
+    </div>
+</div>
+{% endblock %}

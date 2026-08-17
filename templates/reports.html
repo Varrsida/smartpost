@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Operational Reports & Analytics – SmartPost{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <h1 style="font-size: 2rem; margin-bottom: 6px;">Post Office Operation Report</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Comprehensive postal analytics, revenue breakdown, service stats, and AI performance logs.</p>
+    </div>
+    <div style="display: flex; gap: 12px;" class="no-print">
+        <button onclick="window.print()" class="btn btn-primary">🖨️ PRINT REPORT</button>
+    </div>
+</div>
+
+<!-- Executive Summary Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-details">
+            <div class="stat-value">{{ total_customers }}</div>
+            <div class="stat-label">Total Registered Customers</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-details">
+            <div class="stat-value">{{ total_shipments }}</div>
+            <div class="stat-label">Total Shipments</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-details">
+            <div class="stat-value" style="color: #34d399;">{{ delivered_shipments }}</div>
+            <div class="stat-label">Delivered Shipments</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-details">
+            <div class="stat-value" style="color: #fbbf24;">{{ pending_shipments }}</div>
+            <div class="stat-label">Pending / In Transit</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-details">
+            <div class="stat-value">${{ "%.2f"|format(total_revenue) }}</div>
+            <div class="stat-label">Total Revenue</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">💬</div>
+        <div class="stat-details">
+            <div class="stat-value">{{ total_complaints }}</div>
+            <div class="stat-label">Total Complaints Logged</div>
+        </div>
+    </div>
+</div>
+
+<!-- CHARTS GRID -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 28px;">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Service Type Revenue Breakdown</div>
+        </div>
+        <div style="height: 260px; position: relative;">
+            <canvas id="serviceChart"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">AI Delay Risk Classification</div>
+        </div>
+        <div style="height: 260px; position: relative;">
+            <canvas id="predictionChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- SERVICE STATISTICS TABLE -->
+<div class="card" style="margin-bottom: 28px;">
+    <div class="card-header">
+        <div class="card-title">Service Category Performance Summary</div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Service Category</th>
+                    <th>Total Bookings</th>
+                    <th>Revenue Generated ($)</th>
+                    <th>Avg Revenue per Parcel</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in service_stats %}
+                <tr>
+                    <td><strong style="color: var(--accent);">{{ s.service_type }}</strong></td>
+                    <td>{{ s.count }} parcel(s)</td>
+                    <td>${{ "%.2f"|format(s.revenue) }}</td>
+                    <td>${{ "%.2f"|format(s.revenue / s.count if s.count > 0 else 0) }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">No service statistics recorded.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- AI PREDICTION SUMMARY TABLE -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">AI Delay Risk Model Diagnostics</div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Prediction Classification</th>
+                    <th>Total Predictions</th>
+                    <th>Percentage of Volume</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in prediction_stats %}
+                <tr>
+                    <td>
+                        {% if p.prediction_result == 'POSSIBLE DELAY' %}
+                            <span class="badge badge-danger">POSSIBLE DELAY</span>
+                        {% else %}
+                            <span class="badge badge-success">ON TIME</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ p.count }} shipment(s)</td>
+                    <td>{{ "%.1f"|format((p.count / (total_shipments if total_shipments > 0 else 1)) * 100) }}%</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 24px;">No prediction records available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Service Chart
+    const serviceLabels = [{% for s in service_stats %}'{{ s.service_type }}',{% endfor %}];
+    const serviceData = [{% for s in service_stats %}{{ s.revenue }},{% endfor %}];
+    const serviceColors = ['#f97316', '#38bdf8', '#34d399', '#a78bfa', '#e879f9', '#facc15'];
+    
+    initChart('serviceChart', 'bar', serviceLabels, serviceData, serviceColors, 'Revenue ($)');
+
+    // Prediction Chart
+    const predLabels = [{% for p in prediction_stats %}'{{ p.prediction_result }}',{% endfor %}];
+    const predData = [{% for p in prediction_stats %}{{ p.count }},{% endfor %}];
+    const predColors = ['#f87171', '#34d399'];
+    
+    initChart('predictionChart', 'pie', predLabels, predData, predColors, 'Prediction Count');
+});
+</script>
+{% endblock %}

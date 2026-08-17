@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Employee – SmartPost{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <h1 style="font-size: 2rem; margin-bottom: 6px;">Register New Employee</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Create official staff profile and login access credentials.</p>
+        </div>
+        <a href="{{ url_for('employees') }}" class="btn btn-secondary">← Back to Staff Directory</a>
+    </div>
+
+    <div class="card" style="padding: 32px;">
+        <form action="{{ url_for('add_employee') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Employee Full Name *</label>
+                <input type="text" name="name" class="form-control" placeholder="e.g. Marcus Aurelius" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">System Username *</label>
+                    <input type="text" name="username" class="form-control" placeholder="e.g. marcus_a" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Account Password *</label>
+                    <input type="password" name="password" class="form-control" placeholder="Minimum 6 characters" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="text" name="phone" class="form-control" placeholder="+1 (555) 333-4455">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" placeholder="marcus@smartpost.gov">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Designation *</label>
+                    <select name="designation" class="form-select" required>
+                        <option value="Postmaster">Postmaster</option>
+                        <option value="Postal Assistant">Postal Assistant</option>
+                        <option value="Counter Clerk">Counter Clerk</option>
+                        <option value="Delivery Staff">Delivery Staff</option>
+                        <option value="Supervisor">Supervisor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Assigned Branch / Hub *</label>
+                    <input type="text" name="branch" class="form-control" placeholder="e.g. Central General Post Office" required>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Create Staff Account</button>
+                <a href="{{ url_for('employees') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
